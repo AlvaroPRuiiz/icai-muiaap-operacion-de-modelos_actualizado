@@ -63,6 +63,7 @@ def train_and_evaluate(path: Path) -> dict[str, object]:
         "rows": len(dataset),
         "features": len(FEATURES),
         "classes": sorted(target.unique().tolist()),
+        "validation_rows": len(validation_target),
         "validation_f1_macro": f1_score(
             validation_target,
             predictions,
@@ -79,6 +80,7 @@ def main() -> None:
     print(f"Filas: {metrics['rows']}")
     print(f"Variables: {metrics['features']}")
     print(f"Clases: {len(metrics['classes'])}")
+    print(f"Filas de validaci?n: {metrics['validation_rows']}")
     print(f"F1 macro: {metrics['validation_f1_macro']:.4f}")
 
 
