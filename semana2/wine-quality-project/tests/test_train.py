@@ -22,6 +22,7 @@ def test_training_pipeline() -> None:
     assert metrics["rows"] == 1143
     assert metrics["features"] == 11
     assert metrics["classes"] == [3, 4, 5, 6, 7, 8]
+    assert metrics["validation_rows"] == 172
     assert 0.0 <= metrics["validation_f1_macro"] <= 1.0
     assert repeated_metrics["validation_f1_macro"] == pytest.approx(
         metrics["validation_f1_macro"]
