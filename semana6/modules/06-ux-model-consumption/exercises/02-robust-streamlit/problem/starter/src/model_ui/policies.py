@@ -1,6 +1,7 @@
 """Políticas explícitas que el alumnado puede reutilizar en la UI."""
 
 from dataclasses import dataclass
+from math import isfinite
 
 from model_ui.contracts import ConfidenceLevel, LatencyStatus
 
@@ -29,7 +30,17 @@ def classify_confidence(
 ) -> ConfidenceLevel:
     """TODO: valida [0, 1] y devuelve low/medium/high según policy."""
 
-    raise NotImplementedError("TODO: clasifica la confianza con la política acordada")
+    if not isfinite(confidence) or not (0 <= confidence <= 1):
+        raise ValueError("La confianza debe ser finita y estar entre 0 y 1")
+
+    if confidence < policy.low_below:
+        return "low"
+
+    elif confidence < policy.high_from:
+        return "medium"
+
+    else:
+        return "high"
 
 
 def classify_latency(
@@ -37,4 +48,7 @@ def classify_latency(
 ) -> LatencyStatus:
     """TODO: devuelve within_target o above_target para una latencia válida."""
 
-    raise NotImplementedError("TODO: clasifica la latencia")
+    if latency_ms <= policy.target_ms:
+        return "within_target"
+    else:
+        return "above_target"

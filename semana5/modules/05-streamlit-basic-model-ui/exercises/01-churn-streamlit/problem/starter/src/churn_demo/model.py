@@ -5,7 +5,7 @@ from typing import Literal, TypedDict
 
 ChurnLabel = Literal["Baja probable", "Permanencia probable"]
 
-
+#contrato
 class ChurnPrediction(TypedDict):
     """Salida pequeña, serializable y comprensible por cualquier interfaz."""
 

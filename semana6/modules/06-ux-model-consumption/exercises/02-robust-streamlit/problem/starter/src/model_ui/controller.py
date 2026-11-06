@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from model_ui.contracts import UiState
 from model_ui.gateway import InferenceGateway
+from model_ui.presentation import build_prediction_view, to_user_facing_error
 from model_ui.telemetry import Telemetry
 
 StateEmitter = Callable[[UiState], None]
@@ -39,6 +40,62 @@ class PredictionController:
     ) -> UiState:
         """TODO: emite loading, mide, valida la salida y devuelve success/error."""
 
-        raise NotImplementedError(
-            "TODO: implementa la transición loading -> success/error"
+        request_id = self._request_id_factory()
+
+        loading_state = UiState(
+            phase="loading",
+            request_id=request_id,
         )
+
+        if emit is not None:
+            emit(loading_state)
+
+        start_time = self._clock()
+        latency_ms = None
+
+        try:
+            prediction = self.gateway.predict(values)
+
+            latency_ms = round((self._clock() - start_time) * 1000, 3)
+
+            view = build_prediction_view(
+                prediction,
+                latency_ms,
+            )
+
+            self.telemetry.record_success(
+                latency_ms,
+                model_version=prediction.model_version,
+                preprocessing_version=prediction.preprocessing_version,
+            )
+
+            state = UiState(
+                phase="success",
+                request_id=request_id,
+                view=view,
+            )
+
+        except Exception as error:
+            if latency_ms is None:
+                latency_ms = round((self._clock() - start_time) * 1000, 3)
+
+            user_error = to_user_facing_error(
+                error,
+                request_id,
+            )
+
+            self.telemetry.record_error(
+                user_error.code,
+                latency_ms,
+            )
+
+            state = UiState(
+                phase="error",
+                request_id=request_id,
+                error=user_error,
+            )
+
+        if emit is not None:
+            emit(state)
+
+        return state

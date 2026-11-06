@@ -128,8 +128,8 @@ def _s4_source_path() -> Path:
 
     repository_root = _find_repository_root(Path(__file__))
     return repository_root / (
-        "semana4/modules/04-model-packaging/solutions/"
-        "01.02-serializable-inference-module/src"
+        "semana4/modules/04-model-packaging/exercises/01-model-packaging/"
+        "01.02-serializable-inference-module/problem/starter/src"
     )
 
 
